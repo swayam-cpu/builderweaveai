@@ -20,16 +20,8 @@ function Landing() {
       </header>
 
       <section className="relative overflow-hidden">
-        <div aria-hidden className="absolute inset-0 pointer-events-none">
-          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "620px", height: "620px", background: "radial-gradient(circle, oklch(0.82 0.19 170 / 0.9), transparent 60%)", animation: "aurora-a 18s ease-in-out infinite" }} />
-          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "560px", height: "560px", background: "radial-gradient(circle, oklch(0.65 0.22 30 / 0.85), transparent 60%)", animation: "aurora-b 22s ease-in-out infinite" }} />
-          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "500px", height: "500px", background: "radial-gradient(circle, oklch(0.62 0.24 300 / 0.8), transparent 60%)", animation: "aurora-c 26s ease-in-out infinite" }} />
-          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "440px", height: "440px", background: "radial-gradient(circle, oklch(0.72 0.18 220 / 0.75), transparent 60%)", animation: "aurora-d 20s ease-in-out infinite" }} />
-        </div>
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background pointer-events-none" />
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 backdrop-blur px-3 py-1 text-xs text-muted-foreground mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground mb-8">
             <Sparkles className="h-3 w-3 text-primary" /> AI website builder + private mail
           </div>
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
@@ -41,7 +33,7 @@ function Landing() {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 glow-primary">Start building free</Link>
-            <Link to="/auth" search={{ mode: "login" }} className="px-6 py-3 rounded-lg border border-border bg-card/40 backdrop-blur hover:bg-card">I have an account</Link>
+            <Link to="/auth" search={{ mode: "login" }} className="px-6 py-3 rounded-lg border border-border hover:bg-card">I have an account</Link>
           </div>
         </div>
       </section>
@@ -52,7 +44,7 @@ function Landing() {
           { icon: Rocket, title: "Instant publish", desc: "One click and your site is live on a public /s/your-slug URL." },
           { icon: Mail, title: "Weave Mail", desc: "Every account gets a username@weave.com inbox for messaging other users." },
         ].map((f) => (
-          <div key={f.title} className="rounded-xl bg-gradient-card border border-border p-6">
+          <div key={f.title} className="rounded-xl bg-gradient-card border border-border p-6 shadow-sm">
             <f.icon className="h-6 w-6 text-primary mb-3" />
             <h3 className="font-semibold text-lg">{f.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
@@ -60,7 +52,25 @@ function Landing() {
         ))}
       </section>
 
-      <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
+      <section className="relative overflow-hidden mt-8">
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div className="aurora-blob" style={{ top: "60%", left: "22%", width: "620px", height: "620px", background: "radial-gradient(circle, oklch(0.68 0.24 295 / 0.9), transparent 60%)", animation: "aurora-a 18s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "70%", left: "55%", width: "560px", height: "560px", background: "radial-gradient(circle, oklch(0.72 0.22 20 / 0.9), transparent 60%)", animation: "aurora-b 22s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "55%", left: "78%", width: "500px", height: "500px", background: "radial-gradient(circle, oklch(0.75 0.19 55 / 0.85), transparent 60%)", animation: "aurora-c 26s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "75%", left: "38%", width: "480px", height: "480px", background: "radial-gradient(circle, oklch(0.70 0.20 335 / 0.85), transparent 60%)", animation: "aurora-d 20s ease-in-out infinite" }} />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-4 py-32 text-center">
+          <h2 className="text-4xl sm:text-6xl font-bold tracking-tight">Ready to weave something?</h2>
+          <p className="mt-5 text-lg text-muted-foreground max-w-xl mx-auto">
+            Sign up in seconds. Get your @weave.com identity and start building.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 glow-primary">Create free account</Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground bg-background/70 backdrop-blur">
         © {new Date().getFullYear()} Weave. Built with AI.
       </footer>
     </div>

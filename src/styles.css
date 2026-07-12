@@ -107,8 +107,8 @@
   position: absolute;
   border-radius: 9999px;
   filter: blur(90px);
-  opacity: 0.55;
-  mix-blend-mode: screen;
+  opacity: 0.75;
+  mix-blend-mode: multiply;
   will-change: transform;
   pointer-events: none;
 }

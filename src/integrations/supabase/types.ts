@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      mail_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          recipient_id: string
+          sender_id: string
+          subject: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          recipient_id: string
+          sender_id: string
+          subject?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          recipient_id?: string
+          sender_id?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          dob: string
+          full_name: string
+          gender: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          dob: string
+          full_name: string
+          gender: string
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          dob?: string
+          full_name?: string
+          gender?: string
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      sites: {
+        Row: {
+          created_at: string
+          html: string
+          id: string
+          is_published: boolean
+          owner_id: string
+          prompt: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          html?: string
+          id?: string
+          is_published?: boolean
+          owner_id: string
+          prompt?: string
+          slug: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          html?: string
+          id?: string
+          is_published?: boolean
+          owner_id?: string
+          prompt?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

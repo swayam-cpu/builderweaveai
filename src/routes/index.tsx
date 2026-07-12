@@ -20,9 +20,16 @@ function Landing() {
       </header>
 
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-40" />
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "620px", height: "620px", background: "radial-gradient(circle, oklch(0.82 0.19 170 / 0.9), transparent 60%)", animation: "aurora-a 18s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "560px", height: "560px", background: "radial-gradient(circle, oklch(0.65 0.22 30 / 0.85), transparent 60%)", animation: "aurora-b 22s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "500px", height: "500px", background: "radial-gradient(circle, oklch(0.62 0.24 300 / 0.8), transparent 60%)", animation: "aurora-c 26s ease-in-out infinite" }} />
+          <div className="aurora-blob" style={{ top: "50%", left: "50%", width: "440px", height: "440px", background: "radial-gradient(circle, oklch(0.72 0.18 220 / 0.75), transparent 60%)", animation: "aurora-d 20s ease-in-out infinite" }} />
+        </div>
+        <div className="absolute inset-0 grid-bg opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background pointer-events-none" />
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 backdrop-blur px-3 py-1 text-xs text-muted-foreground mb-8">
             <Sparkles className="h-3 w-3 text-primary" /> AI website builder + private mail
           </div>
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
@@ -34,7 +41,7 @@ function Landing() {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 glow-primary">Start building free</Link>
-            <Link to="/auth" search={{ mode: "login" }} className="px-6 py-3 rounded-lg border border-border hover:bg-card">I have an account</Link>
+            <Link to="/auth" search={{ mode: "login" }} className="px-6 py-3 rounded-lg border border-border bg-card/40 backdrop-blur hover:bg-card">I have an account</Link>
           </div>
         </div>
       </section>

@@ -102,3 +102,31 @@
     linear-gradient(90deg, oklch(0.28 0.03 250 / 0.4) 1px, transparent 1px);
   background-size: 40px 40px;
 }
+
+@utility aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes aurora-a {
+  0%,100% { transform: translate(-50%, -50%) scale(1); }
+  33%     { transform: translate(-30%, -65%) scale(1.2); }
+  66%     { transform: translate(-70%, -40%) scale(0.9); }
+}
+@keyframes aurora-b {
+  0%,100% { transform: translate(-50%, -50%) scale(1); }
+  50%     { transform: translate(-65%, -35%) scale(1.25); }
+}
+@keyframes aurora-c {
+  0%,100% { transform: translate(-50%, -50%) scale(1.1); }
+  50%     { transform: translate(-35%, -60%) scale(0.85); }
+}
+@keyframes aurora-d {
+  0%,100% { transform: translate(-50%, -50%) scale(0.95); }
+  50%     { transform: translate(-45%, -55%) scale(1.15); }
+}

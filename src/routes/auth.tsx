@@ -20,7 +20,13 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [dob, setDob] = useState("");
+  const [dobDay, setDobDay] = useState("");
+  const [dobMonth, setDobMonth] = useState("");
+  const [dobYear, setDobYear] = useState("");
+  const dob =
+    dobYear && dobMonth && dobDay
+      ? `${dobYear}-${String(dobMonth).padStart(2, "0")}-${String(dobDay).padStart(2, "0")}`
+      : "";
   const [gender, setGender] = useState("");
 
   const isSignup = mode === "signup";
@@ -104,23 +110,46 @@ function AuthPage() {
                   <input value={fullName} onChange={(e) => setFullName(e.target.value)} required
                     className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
                 </Field>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Date of birth">
-                    <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} required
-                      className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-                  </Field>
-                  <Field label="Gender">
-                    <select value={gender} onChange={(e) => setGender(e.target.value)} required
+                <Field label="Date of birth">
+                  <div className="grid grid-cols-3 gap-2">
+                    <select value={dobDay} onChange={(e) => setDobDay(e.target.value)} required
                       className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring">
-                      <option value="">Select…</option>
-                      <option value="female">Female</option>
-                      <option value="male">Male</option>
-                      <option value="nonbinary">Non-binary</option>
-                      <option value="other">Other</option>
-                      <option value="prefer_not_say">Prefer not to say</option>
+                      <option value="">Day</option>
+                      {Array.from({ length: 31 }, (_, i) => String(i + 1)).map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
                     </select>
-                  </Field>
-                </div>
+                    <select value={dobMonth} onChange={(e) => setDobMonth(e.target.value)} required
+                      className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring">
+                      <option value="">Month</option>
+                      {[
+                        ["1", "Jan"], ["2", "Feb"], ["3", "Mar"], ["4", "Apr"],
+                        ["5", "May"], ["6", "Jun"], ["7", "Jul"], ["8", "Aug"],
+                        ["9", "Sep"], ["10", "Oct"], ["11", "Nov"], ["12", "Dec"],
+                      ].map(([v, l]) => (
+                        <option key={v} value={v}>{l}</option>
+                      ))}
+                    </select>
+                    <select value={dobYear} onChange={(e) => setDobYear(e.target.value)} required
+                      className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring">
+                      <option value="">Year</option>
+                      {Array.from({ length: 100 }, (_, i) => String(new Date().getFullYear() - i)).map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </div>
+                </Field>
+                <Field label="Gender">
+                  <select value={gender} onChange={(e) => setGender(e.target.value)} required
+                    className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring">
+                    <option value="">Select…</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="nonbinary">Non-binary</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_say">Prefer not to say</option>
+                  </select>
+                </Field>
               </>
             )}
 

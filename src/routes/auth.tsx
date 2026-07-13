@@ -49,7 +49,7 @@ function AuthPage() {
         }
         if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
         // Check username availability
-        const { data: available } = await supabase.rpc("username_available", { _username: uname });
+        const { data: available } = await (supabase.rpc as any)("username_available", { _username: uname });
         if (available === false) { toast.error("That username is taken"); return; }
 
         const { data, error } = await supabase.auth.signUp({

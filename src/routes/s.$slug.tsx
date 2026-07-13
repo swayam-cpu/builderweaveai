@@ -6,12 +6,32 @@ const fetchPublishedSite = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ slug: z.string() }).parse(d))
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
+    const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const isNewSupabaseApiKey = publishableKey.startsWith("sb_publishable_") || publishableKey.startsWith("sb_secret_");
+    const supabaseFetch: typeof fetch = (input, init) => {
+      const headers = new Headers(
+        typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+      );
+
+      if (init?.headers) {
+        new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+      }
+
+      if (isNewSupabaseApiKey && headers.get("Authorization") === `Bearer ${publishableKey}`) {
+        headers.delete("Authorization");
+      }
+
+      headers.set("apikey", publishableKey);
+      return fetch(input, { ...init, headers });
+    };
     const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      global: { fetch: supabaseFetch },
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     });
-    const { data: site } = await sb
+    const { data: site, error } = await sb
       .from("sites").select("html,title,is_published")
       .eq("slug", data.slug).eq("is_published", true).maybeSingle();
+    if (error) throw new Error(error.message);
     if (!site) return null;
     return site as { html: string; title: string; is_published: boolean };
   });

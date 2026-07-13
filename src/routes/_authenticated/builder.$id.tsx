@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { generateSite, publishSite } from "@/lib/sites.functions";
+import { getPublicSiteUrl } from "@/lib/public-site-url";
 import { Loader2, Sparkles, Globe, ExternalLink, EyeOff, Copy, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,7 +57,7 @@ function Builder() {
     } finally { setPubBusy(false); }
   };
 
-  const publicUrl = site ? `${typeof window !== "undefined" ? window.location.origin : ""}/s/${site.slug}` : "";
+  const publicUrl = site ? getPublicSiteUrl(site.slug) : "";
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-60px)]">

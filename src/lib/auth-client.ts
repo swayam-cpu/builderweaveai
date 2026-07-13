@@ -4,9 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 export type Profile = {
   id: string;
   username: string;
-  full_name: string;
-  dob: string;
-  gender: string;
 };
 
 export function useAuth() {
@@ -18,7 +15,7 @@ export function useAuth() {
     let mounted = true;
     const load = async (uid: string | null) => {
       if (!uid) { setProfile(null); return; }
-      const { data } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
+      const { data } = await supabase.from("profiles").select("id, username").eq("id", uid).maybeSingle();
       if (mounted) setProfile(data as Profile | null);
     };
     supabase.auth.getSession().then(({ data }) => {

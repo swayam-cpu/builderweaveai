@@ -112,7 +112,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      username_available: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

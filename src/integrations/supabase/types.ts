@@ -109,21 +109,7 @@ export type Database = {
       }
     }
     Views: {
-      user_directory: {
-        Row: {
-          id: string | null
-          username: string | null
-        }
-        Insert: {
-          id?: string | null
-          username?: string | null
-        }
-        Update: {
-          id?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never

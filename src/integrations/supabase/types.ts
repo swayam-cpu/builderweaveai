@@ -109,10 +109,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_directory: {
+        Row: {
+          id: string | null
+          username: string | null
+        }
+        Insert: {
+          id?: string | null
+          username?: string | null
+        }
+        Update: {
+          id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      username_available: { Args: { _username: string }; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

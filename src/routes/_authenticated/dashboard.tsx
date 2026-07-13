@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getPublicSiteUrl } from "@/lib/public-site-url";
 import { Plus, ExternalLink, Globe, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -82,7 +83,7 @@ function Dashboard() {
               </div>
               <div className="mt-4 flex items-center justify-between text-xs">
                 {s.is_published ? (
-                  <a href={`/s/${s.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline font-mono">
+                  <a href={getPublicSiteUrl(s.slug)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline font-mono">
                     /s/{s.slug} <ExternalLink className="h-3 w-3" />
                   </a>
                 ) : (

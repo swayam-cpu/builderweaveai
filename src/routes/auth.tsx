@@ -48,9 +48,6 @@ function AuthPage() {
           return;
         }
         if (password.length < 8) { toast.error("Password must be at least 8 characters"); return; }
-        // Check username availability
-        const { data: available } = await (supabase.rpc as any)("username_available", { _username: uname });
-        if (available === false) { toast.error("That username is taken"); return; }
 
         const { data, error } = await supabase.auth.signUp({
           email, password,
@@ -63,7 +60,10 @@ function AuthPage() {
         const { error: pErr } = await supabase.from("profiles").insert({
           id: uid, username: uname, full_name: fullName.trim(), dob, gender,
         });
-        if (pErr) throw pErr;
+        if (pErr) {
+          if ((pErr as any).code === "23505") { toast.error("That username is taken"); return; }
+          throw pErr;
+        }
         toast.success(`Welcome! Your Weave ID: ${uname}@weave.com`);
         navigate({ to: "/dashboard" });
       } else {

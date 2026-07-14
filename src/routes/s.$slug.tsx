@@ -60,7 +60,7 @@ function PublishedSite() {
       <iframe
         srcDoc={site.html}
         title={site.title}
-        sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+        sandbox="allow-scripts allow-forms allow-popups"
         className="w-full h-screen border-0"
       />
     </div>

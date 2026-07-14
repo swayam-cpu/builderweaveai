@@ -136,7 +136,7 @@ function Builder() {
             ref={iframeRef}
             srcDoc={site.html}
             title="Preview"
-            sandbox="allow-scripts allow-forms allow-same-origin"
+            sandbox="allow-scripts allow-forms"
             className="flex-1 w-full bg-white"
           />
         ) : (

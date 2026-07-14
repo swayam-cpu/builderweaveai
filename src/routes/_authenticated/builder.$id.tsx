@@ -21,6 +21,7 @@ function Builder() {
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState(false);
   const [pubBusy, setPubBusy] = useState(false);
+  const [attachments, setAttachments] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const genFn = useServerFn(generateSite);

@@ -39,8 +39,9 @@ function Builder() {
     if (!prompt.trim()) { toast.error("Describe your site first"); return; }
     setBusy(true);
     try {
-      const res = await genFn({ data: { siteId: id, prompt } });
+      const res = await genFn({ data: { siteId: id, prompt, images: attachments } });
       setSite((s) => s ? { ...s, html: res.html, title: res.title, prompt } : s);
+      setAttachments([]);
       toast.success("Site generated ✨");
     } catch (e: any) {
       toast.error(e.message ?? "Generation failed");

@@ -16,10 +16,23 @@ STRICT RULES:
 
 export const generateSite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ siteId: z.string().uuid(), prompt: z.string().min(3).max(2000) }).parse(d))
+  .inputValidator((d) =>
+    z.object({
+      siteId: z.string().uuid(),
+      prompt: z.string().min(3).max(2000),
+      images: z.array(z.string()).max(4).optional(),
+    }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured");
+
+    const userContent: Array<Record<string, unknown>> = [
+      { type: "text", text: data.prompt + (data.images?.length ? "\n\nUse the attached image(s) as strong visual/design reference — match their style, palette, and mood." : "") },
+    ];
+    for (const url of data.images ?? []) {
+      userContent.push({ type: "image_url", image_url: { url } });
+    }
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -28,7 +41,7 @@ export const generateSite = createServerFn({ method: "POST" })
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: data.prompt },
+          { role: "user", content: userContent },
         ],
       }),
     });

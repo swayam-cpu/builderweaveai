@@ -6,6 +6,7 @@ import { generateSite, publishSite } from "@/lib/sites.functions";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
 import { Loader2, Sparkles, Globe, ExternalLink, EyeOff, Copy, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { PromptInput } from "@/components/PromptInput";
 
 export const Route = createFileRoute("/_authenticated/builder/$id")({ component: Builder });
 
@@ -20,6 +21,7 @@ function Builder() {
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState(false);
   const [pubBusy, setPubBusy] = useState(false);
+  const [attachments, setAttachments] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const genFn = useServerFn(generateSite);
@@ -37,8 +39,9 @@ function Builder() {
     if (!prompt.trim()) { toast.error("Describe your site first"); return; }
     setBusy(true);
     try {
-      const res = await genFn({ data: { siteId: id, prompt } });
+      const res = await genFn({ data: { siteId: id, prompt, images: attachments } });
       setSite((s) => s ? { ...s, html: res.html, title: res.title, prompt } : s);
+      setAttachments([]);
       toast.success("Site generated ✨");
     } catch (e: any) {
       toast.error(e.message ?? "Generation failed");
@@ -76,13 +79,16 @@ function Builder() {
         <div className="p-4 flex-1 overflow-y-auto space-y-4">
           <div>
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Describe your site</label>
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="A modern portfolio for a photographer who shoots architecture in Tokyo. Dark theme, minimalist, big image grid, contact form."
-              rows={10}
-              className="mt-2 w-full rounded-md border border-border bg-input px-3 py-2 text-sm font-sans resize-none outline-none focus:ring-2 focus:ring-ring"
-            />
+            <div className="mt-2">
+              <PromptInput
+                value={prompt}
+                onChange={setPrompt}
+                attachments={attachments}
+                onAttachmentsChange={setAttachments}
+                placeholder="A modern portfolio for a photographer who shoots architecture in Tokyo. Dark theme, minimalist, big image grid, contact form."
+                rows={10}
+              />
+            </div>
           </div>
           <button onClick={generate} disabled={busy}
             className="w-full rounded-md bg-primary text-primary-foreground font-medium py-2.5 text-sm flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 glow-primary">

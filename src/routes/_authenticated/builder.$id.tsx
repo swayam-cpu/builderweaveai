@@ -6,6 +6,7 @@ import { generateSite, publishSite } from "@/lib/sites.functions";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
 import { Loader2, Sparkles, Globe, ExternalLink, EyeOff, Copy, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { PromptInput } from "@/components/PromptInput";
 
 export const Route = createFileRoute("/_authenticated/builder/$id")({ component: Builder });
 

@@ -12,7 +12,11 @@ STRICT RULES:
 - Use images from https://images.unsplash.com/ with keyword URLs like https://source.unsplash.com/1200x800/?keyword.
 - Design must be beautiful, modern, and responsive. Not generic. Not purple. Distinctive palette per site.
 - All JS interactivity inline in a <script> tag if needed.
-- Do not use external CSS/JS frameworks (no Tailwind CDN, no React).`;
+- Do not use external CSS/JS frameworks (no Tailwind CDN, no React).
+- If DATABASE TABLES are provided below, the site has a live backend accessible via window.WeaveDB.
+  Use it to render dynamic data. Example: window.WeaveDB.list('products').then(rows => { ... render rows ... }).
+  Each row has an id, created_at, and the fields from the table columns.
+  Prefer real data fetches over hardcoded placeholders when a matching table exists.`;
 
 export const generateSite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -27,8 +31,18 @@ export const generateSite = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured");
 
+    // Fetch the site's designed schema (if any) to give the AI backend context
+    const { data: tables } = await context.supabase
+      .from("site_tables").select("name, columns").eq("site_id", data.siteId).order("name");
+
+    let schemaBlock = "";
+    if (tables && tables.length) {
+      schemaBlock = "\n\nDATABASE TABLES available via window.WeaveDB:\n" +
+        tables.map((t: any) => `- ${t.name}: ${(t.columns as any[]).map((c) => `${c.name} (${c.type})`).join(", ")}`).join("\n");
+    }
+
     const userContent: Array<Record<string, unknown>> = [
-      { type: "text", text: data.prompt + (data.images?.length ? "\n\nUse the attached image(s) as strong visual/design reference — match their style, palette, and mood." : "") },
+      { type: "text", text: data.prompt + (data.images?.length ? "\n\nUse the attached image(s) as strong visual/design reference — match their style, palette, and mood." : "") + schemaBlock },
     ];
     for (const url of data.images ?? []) {
       userContent.push({ type: "image_url", image_url: { url } });

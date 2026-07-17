@@ -1,6 +1,7 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { injectWeaveDB } from "@/lib/weave-db-injector";
 
 const fetchPublishedSite = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ slug: z.string() }).parse(d))
@@ -55,10 +56,12 @@ export const Route = createFileRoute("/s/$slug")({
 
 function PublishedSite() {
   const site = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const html = injectWeaveDB(site.html, slug);
   return (
     <div className="min-h-screen bg-white">
       <iframe
-        srcDoc={site.html}
+        srcDoc={html}
         title={site.title}
         sandbox="allow-scripts allow-forms allow-popups"
         className="w-full h-screen border-0"

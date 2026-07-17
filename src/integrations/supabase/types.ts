@@ -71,6 +71,80 @@ export type Database = {
         }
         Relationships: []
       }
+      site_rows: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          site_id: string
+          table_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          site_id: string
+          table_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          site_id?: string
+          table_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_rows_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_rows_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "site_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_tables: {
+        Row: {
+          columns: Json
+          created_at: string
+          id: string
+          name: string
+          site_id: string
+        }
+        Insert: {
+          columns?: Json
+          created_at?: string
+          id?: string
+          name: string
+          site_id: string
+        }
+        Update: {
+          columns?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_tables_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sites: {
         Row: {
           created_at: string

@@ -1,61 +1,64 @@
-## Goal
+# Per-project generated database
 
-Add two capabilities to every prompt input in the app (currently the Builder page's "Describe your site" textarea, and any future prompt inputs):
+Each site (project) gets its own logical database. The AI designs the tables from the prompt, and the generated HTML can list/insert/update/delete rows.
 
-1. **Mic button** — record voice, transcribe via Lovable AI, append the transcript to the prompt textarea.
-2. **Image attach button** — attach one or more images used as design references sent to the AI along with the text prompt.
+## Approach: JSONB-backed logical tables (not raw DDL)
 
-## Approach
+Real per-project schemas would need runtime DDL (dangerous, slow, and doesn't fit RLS cleanly). Instead:
 
-### 1. Reusable `PromptInput` component (`src/components/PromptInput.tsx`)
-Wraps the textarea and exposes:
-- `value`, `onChange`, `placeholder`, `rows`
-- Toolbar row under the textarea with:
-  - Mic button (idle → recording → transcribing states)
-  - Attach image button (multi-select, image/*)
-  - Thumbnails of attached images with remove (×)
-- Emits `attachments: string[]` (base64 data URLs) via `onAttachmentsChange`
+- `site_tables` — one row per logical table (name, columns definition as JSONB).
+- `site_rows` — one row per record, `data JSONB`, linked to `site_tables`.
+- Everything scoped by `site_id → sites.owner_id`; RLS reuses existing ownership.
+- Published sites can expose read-only data anonymously via a public server route keyed by slug.
 
-Recording uses Web Audio API → WAV blob (per knowledge guidance, to avoid Safari mp4 / webm header issues).
+Pros: no DDL at runtime, full RLS, works for any schema the AI designs, easy to render in a spreadsheet UI later.
 
-### 2. Server function: transcribe audio (`src/lib/ai.functions.ts`)
-- `transcribeAudio` — `createServerFn({ method: "POST" })` with `requireSupabaseAuth`
-- Input: `{ audioBase64: string, mimeType: string }`
-- Calls `https://ai.gateway.lovable.dev/v1/audio/transcriptions` with model `openai/gpt-4o-transcribe`, `stream: "false"` (simpler; short recordings)
-- Returns `{ text: string }`
+## Scope of this step
 
-Non-streaming keeps the server function typed RPC. For longer/live UX we can upgrade to a streaming server route later; not needed for "append to prompt" flow.
+1. **Migration** — create `site_tables` and `site_rows` with RLS + grants.
+2. **AI schema designer** — new server fn `designSiteSchema({ siteId, prompt })` that calls Lovable AI, returns `{ tables: [{ name, columns: [{ name, type, required }] }] }`, and upserts rows into `site_tables`.
+3. **Row CRUD server fns** — `listRows`, `insertRow`, `updateRow`, `deleteRow` (owner-only via `requireSupabaseAuth`).
+4. **Public read route** — `GET /api/public/sites/$slug/data/$table` returns rows for published sites (anon SELECT policy).
+5. **Update site generator** — inject the site's schema + a tiny `window.WeaveDB` JS SDK into the generated HTML, so the AI writes pages that read/write the project's tables.
+6. **Builder UI** — a "Database" tab on `/builder/$id` showing the AI-designed tables and their rows in read-only form (the no-code editor is the next milestone).
 
-### 3. Update `generateSite` server function (`src/lib/sites.functions.ts`)
-- Accept optional `images: string[]` (base64 data URLs) in input.
-- Send them to the chat model as multimodal `content` blocks (text + `image_url`) so the AI uses them as design reference.
-- Model stays `google/gemini-2.5-flash` (supports image input).
+## Data model
 
-### 4. Wire into Builder (`src/routes/_authenticated/builder.$id.tsx`)
-- Replace the raw `<textarea>` with `<PromptInput>`
-- Track `attachments` state
-- Pass `images: attachments` when calling `generateSite`
-- Clear attachments after successful generation
+```text
+site_tables
+  id uuid pk
+  site_id uuid fk → sites.id (cascade)
+  name text (unique per site)
+  columns jsonb  -- [{ name, type: 'text'|'number'|'boolean'|'date'|'url', required }]
+  created_at timestamptz
 
-### 5. Toasts / errors
-- Mic permission denied → toast
-- Empty recording → toast, don't call API
-- Image > 5MB → toast, reject
-- Max 4 attachments
+site_rows
+  id uuid pk
+  site_id uuid fk → sites.id (cascade)
+  table_id uuid fk → site_tables.id (cascade)
+  data jsonb
+  created_at, updated_at timestamptz
+```
 
-## Files
+RLS: `owner via sites.owner_id` for authenticated CRUD. Anonymous SELECT on `site_rows` only when the parent `sites.is_published = true` (via a security-definer helper).
 
-**New:**
-- `src/components/PromptInput.tsx` — reusable input with mic + image attach
-- `src/lib/ai.functions.ts` — `transcribeAudio` server function
-- `src/lib/wav-encoder.ts` — small PCM→WAV helper
+## What the generated site sees
 
-**Edited:**
-- `src/lib/sites.functions.ts` — accept `images`, send multimodal content
-- `src/routes/_authenticated/builder.$id.tsx` — use `PromptInput`, pass attachments
+The builder passes the schema into the AI prompt and injects this into the HTML `<head>`:
 
-## Notes / trade-offs
+```html
+<script>
+  window.WEAVE_SITE = { slug: "site-abc123" };
+  window.WeaveDB = {
+    list: (table) => fetch(`/api/public/sites/${WEAVE_SITE.slug}/data/${table}`).then(r => r.json())
+  };
+</script>
+```
 
-- Non-streaming transcription (simpler; a full recording of a few seconds returns in ~1s). Can upgrade to SSE streaming later if you want live captions in the textarea.
-- Images are inlined as base64 in the request (no storage bucket needed since they're design references only, not embedded in the generated site).
-- Only place with a prompt today is the Builder. `PromptInput` is generic so it drops into any future prompt UI.
+Writes stay in the builder (owner-only) for now; public write endpoints are a later step (needs per-project auth).
+
+## Out of scope for this step
+- No-code spreadsheet editor (next milestone)
+- Auth for end users of generated apps
+- Public write endpoints
+- File/image uploads inside generated apps

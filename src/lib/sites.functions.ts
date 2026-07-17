@@ -12,7 +12,11 @@ STRICT RULES:
 - Use images from https://images.unsplash.com/ with keyword URLs like https://source.unsplash.com/1200x800/?keyword.
 - Design must be beautiful, modern, and responsive. Not generic. Not purple. Distinctive palette per site.
 - All JS interactivity inline in a <script> tag if needed.
-- Do not use external CSS/JS frameworks (no Tailwind CDN, no React).`;
+- Do not use external CSS/JS frameworks (no Tailwind CDN, no React).
+- If DATABASE TABLES are provided below, the site has a live backend accessible via window.WeaveDB.
+  Use it to render dynamic data. Example: window.WeaveDB.list('products').then(rows => { ... render rows ... }).
+  Each row has an id, created_at, and the fields from the table columns.
+  Prefer real data fetches over hardcoded placeholders when a matching table exists.`;
 
 export const generateSite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

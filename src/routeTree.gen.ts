@@ -16,6 +16,7 @@ import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as AuthenticatedMailRouteImport } from './routes/_authenticated/mail'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
+import { Route as ApiPublicSitesSlugDataTableRouteImport } from './routes/api/public/sites.$slug.data.$table'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -51,6 +52,12 @@ const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
   path: '/builder/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicSitesSlugDataTableRoute =
+  ApiPublicSitesSlugDataTableRouteImport.update({
+    id: '/api/public/sites/$slug/data/$table',
+    path: '/api/public/sites/$slug/data/$table',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/mail': typeof AuthenticatedMailRoute
   '/s/$slug': typeof SSlugRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +75,7 @@ export interface FileRoutesByTo {
   '/mail': typeof AuthenticatedMailRoute
   '/s/$slug': typeof SSlugRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +86,7 @@ export interface FileRoutesById {
   '/_authenticated/mail': typeof AuthenticatedMailRoute
   '/s/$slug': typeof SSlugRoute
   '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,8 +97,16 @@ export interface FileRouteTypes {
     | '/mail'
     | '/s/$slug'
     | '/builder/$id'
+    | '/api/public/sites/$slug/data/$table'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/mail' | '/s/$slug' | '/builder/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/mail'
+    | '/s/$slug'
+    | '/builder/$id'
+    | '/api/public/sites/$slug/data/$table'
   id:
     | '__root__'
     | '/'
@@ -98,6 +116,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mail'
     | '/s/$slug'
     | '/_authenticated/builder/$id'
+    | '/api/public/sites/$slug/data/$table'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,6 +124,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SSlugRoute: typeof SSlugRoute
+  ApiPublicSitesSlugDataTableRoute: typeof ApiPublicSitesSlugDataTableRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuilderIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/sites/$slug/data/$table': {
+      id: '/api/public/sites/$slug/data/$table'
+      path: '/api/public/sites/$slug/data/$table'
+      fullPath: '/api/public/sites/$slug/data/$table'
+      preLoaderRoute: typeof ApiPublicSitesSlugDataTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -181,6 +208,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SSlugRoute: SSlugRoute,
+  ApiPublicSitesSlugDataTableRoute: ApiPublicSitesSlugDataTableRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

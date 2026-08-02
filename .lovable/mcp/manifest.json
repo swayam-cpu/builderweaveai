@@ -1,0 +1,298 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://zqivkwlxwkcoeoqjvhup.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "weave-studio",
+      "version": "0.1.0",
+      "title": "Weave Studio"
+    },
+    "tools": [
+      {
+        "name": "list_sites",
+        "title": "List sites",
+        "description": "List the signed-in Weave user's sites with their slug, title and publish state.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_site",
+        "title": "Get site",
+        "description": "Fetch one of the signed-in user's sites, including its generated HTML.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "siteId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "The site id, as returned by list_sites."
+            },
+            "includeHtml": {
+              "description": "Include the full HTML document (default true).",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "siteId"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_site",
+        "title": "Create site",
+        "description": "Create a new empty Weave site for the signed-in user with a prompt describing it. Generate the HTML afterwards in the Weave builder.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Site title."
+            },
+            "prompt": {
+              "description": "Description of the site to build.",
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "required": [
+            "title"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "set_site_published",
+        "title": "Publish or unpublish site",
+        "description": "Publish or unpublish one of the signed-in user's sites. Published sites are readable by anyone.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "siteId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "The site id."
+            },
+            "publish": {
+              "type": "boolean",
+              "description": "true to publish, false to unpublish."
+            }
+          },
+          "required": [
+            "siteId",
+            "publish"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_site_tables",
+        "title": "List site tables",
+        "description": "List the database tables designed for one of the signed-in user's sites, with their columns.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "siteId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "The site id."
+            }
+          },
+          "required": [
+            "siteId"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_site_rows",
+        "title": "List site rows",
+        "description": "Read rows stored in one of the signed-in user's site tables.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tableId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Table id, as returned by list_site_tables."
+            },
+            "limit": {
+              "description": "Max rows to return (default 50, max 200).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "tableId"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "insert_site_row",
+        "title": "Insert site row",
+        "description": "Insert one row of data into one of the signed-in user's site tables.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "siteId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "The site id that owns the table."
+            },
+            "tableId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Table id, as returned by list_site_tables."
+            },
+            "data": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {},
+              "description": "Column name to value map matching the table columns."
+            }
+          },
+          "required": [
+            "siteId",
+            "tableId",
+            "data"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_mail",
+        "title": "List Weave Mail",
+        "description": "List the signed-in user's Weave Mail messages (inbox or sent).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "box": {
+              "description": "Which mailbox to read (default inbox).",
+              "type": "string",
+              "enum": [
+                "inbox",
+                "sent"
+              ]
+            },
+            "limit": {
+              "description": "Max messages (default 25, max 100).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "send_mail",
+        "title": "Send Weave Mail",
+        "description": "Send a Weave Mail message from the signed-in user to another Weave user, addressed by their Weave ID (username or username@weave.com).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Recipient Weave ID, e.g. alice or alice@weave.com."
+            },
+            "subject": {
+              "description": "Message subject.",
+              "type": "string",
+              "maxLength": 200
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 10000,
+              "description": "Message body."
+            }
+          },
+          "required": [
+            "to",
+            "body"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

@@ -5,7 +5,16 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AtSign, Loader2 } from "lucide-react";
 
-const searchSchema = z.object({ mode: z.enum(["login", "signup"]).catch("signup") });
+const searchSchema = z.object({
+  mode: z.enum(["login", "signup"]).catch("signup"),
+  next: z.string().optional().catch(undefined),
+});
+
+function safeNext(next?: string): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -13,9 +22,11 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { mode } = Route.useSearch();
+  const { mode, next } = Route.useSearch();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const redirectPath = safeNext(next);
+
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

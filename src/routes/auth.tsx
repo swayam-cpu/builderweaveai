@@ -62,7 +62,7 @@ function AuthPage() {
 
         const { data, error } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: redirectPath ? `${window.location.origin}${redirectPath}` : window.location.origin },
         });
         if (error) throw error;
         const uid = data.user?.id;
@@ -76,13 +76,16 @@ function AuthPage() {
           throw pErr;
         }
         toast.success(`Welcome! Your Weave ID: ${uname}@weave.com`);
+        if (redirectPath) { window.location.href = redirectPath; return; }
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in");
+        if (redirectPath) { window.location.href = redirectPath; return; }
         navigate({ to: "/dashboard" });
       }
+
     } catch (err: any) {
       toast.error(err.message ?? "Something went wrong");
     } finally {

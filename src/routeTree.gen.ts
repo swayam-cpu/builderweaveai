@@ -18,6 +18,7 @@ import { Route as AuthenticatedMailRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as ApiPublicWcRouteImport } from './routes/api/public/wc'
 import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -69,6 +70,11 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicWcRoute = ApiPublicWcRouteImport.update({
+  id: '/api/public/wc',
+  path: '/api/public/wc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
   id: '/builder/$id',
   path: '/builder/$id',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/wc': typeof ApiPublicWcRoute
   '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRoutesByTo {
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/wc': typeof ApiPublicWcRoute
   '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRoutesById {
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/api/public/wc': typeof ApiPublicWcRoute
   '/api/public/sites/$slug/data/$table': typeof ApiPublicSitesSlugDataTableRoute
 }
 export interface FileRouteTypes {
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/builder/$id'
+    | '/api/public/wc'
     | '/api/public/sites/$slug/data/$table'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/builder/$id'
+    | '/api/public/wc'
     | '/api/public/sites/$slug/data/$table'
   id:
     | '__root__'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/builder/$id'
+    | '/api/public/wc'
     | '/api/public/sites/$slug/data/$table'
   fileRoutesById: FileRoutesById
 }
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   SSlugRoute: typeof SSlugRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicWcRoute: typeof ApiPublicWcRoute
   ApiPublicSitesSlugDataTableRoute: typeof ApiPublicSitesSlugDataTableRoute
 }
 
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/wc': {
+      id: '/api/public/wc'
+      path: '/api/public/wc'
+      fullPath: '/api/public/wc'
+      preLoaderRoute: typeof ApiPublicWcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/builder/$id': {
       id: '/_authenticated/builder/$id'
       path: '/builder/$id'
@@ -317,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   SSlugRoute: SSlugRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicWcRoute: ApiPublicWcRoute,
   ApiPublicSitesSlugDataTableRoute: ApiPublicSitesSlugDataTableRoute,
 }
 export const routeTree = rootRouteImport

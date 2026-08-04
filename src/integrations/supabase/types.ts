@@ -148,9 +148,12 @@ export type Database = {
       sites: {
         Row: {
           created_at: string
+          dist: Json
+          files: Json
           html: string
           id: string
           is_published: boolean
+          kind: string
           owner_id: string
           prompt: string
           slug: string
@@ -159,9 +162,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          dist?: Json
+          files?: Json
           html?: string
           id?: string
           is_published?: boolean
+          kind?: string
           owner_id: string
           prompt?: string
           slug: string
@@ -170,9 +176,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          dist?: Json
+          files?: Json
           html?: string
           id?: string
           is_published?: boolean
+          kind?: string
           owner_id?: string
           prompt?: string
           slug?: string

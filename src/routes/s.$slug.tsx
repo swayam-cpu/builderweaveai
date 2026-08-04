@@ -30,11 +30,11 @@ const fetchPublishedSite = createServerFn({ method: "GET" })
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     });
     const { data: site, error } = await sb
-      .from("sites").select("html,title,is_published")
+      .from("sites").select("html,title,is_published,dist,kind")
       .eq("slug", data.slug).eq("is_published", true).maybeSingle();
     if (error) throw new Error(error.message);
     if (!site) return null;
-    return site as { html: string; title: string; is_published: boolean };
+    return site as { html: string; title: string; is_published: boolean; dist: Record<string, string> | null; kind: string | null };
   });
 
 export const Route = createFileRoute("/s/$slug")({
@@ -57,7 +57,17 @@ export const Route = createFileRoute("/s/$slug")({
 function PublishedSite() {
   const site = Route.useLoaderData();
   const { slug } = Route.useParams();
-  const html = injectWeaveDB(site.html, slug);
+  const dist = (site.dist ?? {}) as Record<string, string>;
+  const built = dist["index.html"];
+  const html = built
+    ? injectWeaveDB(
+        built.replace(
+          /(src|href)="\.?\/?(assets\/[^"]+)"/g,
+          `$1="/api/public/sites/${slug}/f/$2"`,
+        ),
+        slug,
+      )
+    : injectWeaveDB(site.html, slug);
   return (
     <div className="min-h-screen bg-white">
       <iframe

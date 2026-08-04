@@ -2,11 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { generateSite, publishSite } from "@/lib/sites.functions";
+import { publishSite } from "@/lib/sites.functions";
+import { generateProject, saveProjectDist } from "@/lib/project.functions";
 import { designSiteSchema, getSiteSchema, listRows, insertRow, deleteRow } from "@/lib/site-data.functions";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
-import { injectWeaveDB } from "@/lib/weave-db-injector";
-import { Loader2, Sparkles, Globe, ExternalLink, EyeOff, Copy, ArrowLeft, Database, Wand2, Plus, Trash2, Layers } from "lucide-react";
+import { Loader2, Sparkles, Globe, ExternalLink, EyeOff, Copy, ArrowLeft, Database, Wand2, Plus, Trash2, Layers, Play, FileCode } from "lucide-react";
 import { toast } from "sonner";
 import { PromptInput } from "@/components/PromptInput";
 
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/builder/$id")({ component:
 
 type Site = {
   id: string; title: string; slug: string; html: string; prompt: string; is_published: boolean;
+  files: Record<string, string> | null; dist: Record<string, string> | null; kind: string | null;
 };
 
 type SiteColumn = { name: string; type: "text" | "number" | "boolean" | "date" | "url"; required?: boolean };
@@ -31,9 +32,12 @@ function Builder() {
   const [tab, setTab] = useState<"design" | "database">("design");
   const [tables, setTables] = useState<SiteTable[]>([]);
   const [designBusy, setDesignBusy] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const wcWin = useRef<Window | null>(null);
+  const filesRef = useRef<Record<string, string>>({});
+  const [wcOpen, setWcOpen] = useState(false);
 
-  const genFn = useServerFn(generateSite);
+  const genFn = useServerFn(generateProject);
+  const saveDistFn = useServerFn(saveProjectDist);
   const pubFn = useServerFn(publishSite);
   const designFn = useServerFn(designSiteSchema);
   const schemaFn = useServerFn(getSiteSchema);
@@ -42,6 +46,7 @@ function Builder() {
     const { data, error } = await supabase.from("sites").select("*").eq("id", id).maybeSingle();
     if (error || !data) { toast.error("Site not found"); navigate({ to: "/dashboard" }); return; }
     setSite(data as Site);
+    filesRef.current = ((data as Site).files ?? {}) as Record<string, string>;
     setPrompt((data as Site).prompt);
     try {
       const s = await schemaFn({ data: { siteId: id } });
@@ -50,14 +55,52 @@ function Builder() {
   };
   useEffect(() => { load(); }, [id]);
 
+  useEffect(() => {
+    const onMessage = async (event: MessageEvent) => {
+      const msg = event.data;
+      if (!msg || typeof msg !== "object") return;
+      if (msg.type === "weave:wc-ready") {
+        setWcOpen(true);
+        event.source && (event.source as Window).postMessage({ type: "weave:files", files: filesRef.current }, "*");
+      }
+      if (msg.type === "weave:dist" && msg.dist) {
+        try {
+          const res = await saveDistFn({ data: { siteId: id, dist: msg.dist } });
+          toast.success(`Build saved (${res.count} files) — ready to publish`);
+        } catch (e: any) {
+          toast.error(e.message ?? "Could not save build");
+        }
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [id]);
+
+  const openPreview = () => {
+    if (!Object.keys(filesRef.current).length) { toast.error("Generate your app first"); return; }
+    if (wcWin.current && !wcWin.current.closed) {
+      wcWin.current.focus();
+      wcWin.current.postMessage({ type: "weave:files", files: filesRef.current }, "*");
+      return;
+    }
+    wcWin.current = window.open("/api/public/wc", "weave-webcontainer", "width=1280,height=860");
+    if (!wcWin.current) toast.error("Allow pop-ups to open the live preview");
+  };
+
   const generate = async () => {
     if (!prompt.trim()) { toast.error("Describe your site first"); return; }
     setBusy(true);
     try {
       const res = await genFn({ data: { siteId: id, prompt, images: attachments } });
-      setSite((s) => s ? { ...s, html: res.html, title: res.title, prompt } : s);
+      filesRef.current = res.files;
+      setSite((s) => s ? { ...s, files: res.files, title: res.title, kind: "multi", prompt } : s);
       setAttachments([]);
-      toast.success("Site generated ✨");
+      toast.success(`Generated ${Object.keys(res.files).length} files ✨`);
+      if (wcWin.current && !wcWin.current.closed) {
+        wcWin.current.postMessage({ type: "weave:files", files: res.files }, "*");
+      } else {
+        openPreview();
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Generation failed");
     } finally { setBusy(false); }
@@ -88,7 +131,7 @@ function Builder() {
   };
 
   const publicUrl = site ? getPublicSiteUrl(site.slug) : "";
-  const previewHtml = site?.html ? injectWeaveDB(site.html, site.slug) : "";
+  const fileList = Object.keys(site?.files ?? {}).sort();
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-60px)]">
@@ -134,12 +177,16 @@ function Builder() {
               <button onClick={generate} disabled={busy}
                 className="w-full rounded-md bg-primary text-primary-foreground font-medium py-2.5 text-sm flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 glow-primary">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                {site?.html ? "Regenerate site" : "Generate site"}
+                {fileList.length ? "Regenerate app" : "Generate app"}
               </button>
 
               {site && (
                 <div className="pt-4 border-t border-border space-y-2">
-                  <button onClick={togglePublish} disabled={pubBusy || !site.html}
+                  <button onClick={openPreview} disabled={!fileList.length}
+                    className="w-full rounded-md border border-border font-medium py-2 text-sm flex items-center justify-center gap-2 hover:bg-card disabled:opacity-50">
+                    <Play className="h-4 w-4" /> {wcOpen ? "Focus live preview" : "Open live preview"}
+                  </button>
+                  <button onClick={togglePublish} disabled={pubBusy || !(site.dist && site.dist["index.html"])}
                     className={`w-full rounded-md font-medium py-2 text-sm flex items-center justify-center gap-2 disabled:opacity-50 ${site.is_published ? "border border-border hover:bg-card" : "bg-accent text-accent-foreground hover:opacity-90 glow-accent"}`}>
                     {pubBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : site.is_published ? <EyeOff className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                     {site.is_published ? "Unpublish" : "Publish"}
@@ -179,16 +226,30 @@ function Builder() {
             <div className="h-2.5 w-2.5 rounded-full bg-accent/50" />
             <div className="h-2.5 w-2.5 rounded-full bg-primary/50" />
           </div>
-          <span className="ml-2 font-mono">Preview</span>
+          <span className="ml-2 font-mono">Project</span>
         </div>
-        {previewHtml ? (
-          <iframe
-            ref={iframeRef}
-            srcDoc={previewHtml}
-            title="Preview"
-            sandbox="allow-scripts allow-forms"
-            className="flex-1 w-full bg-white"
-          />
+        {fileList.length ? (
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="max-w-xl mx-auto">
+              <button onClick={openPreview}
+                className="w-full rounded-md bg-primary text-primary-foreground font-medium py-3 text-sm flex items-center justify-center gap-2 hover:opacity-90 glow-primary">
+                <Play className="h-4 w-4" /> Run live preview in WebContainer
+              </button>
+              <p className="mt-3 text-xs text-muted-foreground text-center">
+                Opens a real Node dev server in a new tab: installs dependencies, runs Vite, and hot-reloads.
+                Use “Build &amp; save for publish” there before publishing.
+              </p>
+              <div className="mt-6 rounded-md border border-border divide-y divide-border">
+                {fileList.map((f) => (
+                  <div key={f} className="flex items-center gap-2 px-3 py-2 text-xs font-mono">
+                    <FileCode className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+                    <span className="truncate">{f}</span>
+                    <span className="ml-auto text-muted-foreground">{(site?.files?.[f]?.length ?? 0)} B</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-center px-4">
             <div>

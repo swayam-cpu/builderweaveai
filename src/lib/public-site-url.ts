@@ -1,4 +1,4 @@
-const PUBLISHED_ORIGIN = "https://builderweave.lovable.app";
+const PUBLISHED_ORIGIN = "https://builderweaveai.lovable.app";
 
 export function getPublicSiteUrl(slug: string) {
   if (typeof window === "undefined") return `${PUBLISHED_ORIGIN}/s/${slug}`;

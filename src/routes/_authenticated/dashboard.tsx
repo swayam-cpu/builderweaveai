@@ -18,7 +18,13 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const load = async () => {
-    const { data } = await supabase.from("sites").select("id,title,slug,is_published,created_at,prompt").order("created_at", { ascending: false });
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { setSites([]); return; }
+    const { data } = await supabase
+      .from("sites")
+      .select("id,title,slug,is_published,created_at,prompt")
+      .eq("owner_id", u.user.id)
+      .order("created_at", { ascending: false });
     setSites((data as Site[]) ?? []);
   };
   useEffect(() => { load(); }, []);

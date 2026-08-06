@@ -4,7 +4,7 @@ Create a website like lovable.dev and bolt.new which can create websites, previe
 
 Authentication by signup, creating account like same to same Gmail and get an unique ID (username123@weave.com) and in menu of website a mailbox where they can send messages like Gmail using unique ID but only in app
 
-This project was built with [Lovable](https://lovable.dev).
+This project was built with weave studio
 
 **Live app**: https://builderweaveai.lovable.app
 
